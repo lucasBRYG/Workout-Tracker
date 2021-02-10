@@ -18,16 +18,19 @@ router.get("api/workouts/range", (req,res) => {
     });
 });
 
-router.put("/api/workouts/:id", (req,res) => {
-    Exzersize.create(req.body).then(workout => {
-        res.json(workout);
-    }).catch(err => {
-        res.status(400).json(err);
-    })
+router.put("/api/workouts/:id", (req, res) => {
+    Excersize.create(req.body)
+      .then(({ _id }) => Workout.findOneAndUpdate({_id:req.params.id}, { $inc: { totalDuration: +req.body.duration}, $push: { exercises: _id } }, { new: true }))
+      .then(dbWorkout => {
+        res.json(dbWorkout);
+      })
+      .catch(err => {
+        res.json(err);
+      });
 });
 
-router.post("api/workouts", (req,res) => {
-    Workout.create(body).then(workouts => {
+router.post("/api/workouts", (req,res) => {
+    Workout.create(req.body).then(workouts => {
         res.json(workouts);
     }).catch(err => {
         res.status(400).json(err);
